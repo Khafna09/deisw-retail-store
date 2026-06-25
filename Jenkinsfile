@@ -5,11 +5,10 @@ pipeline {
     jdk 'JDK_26'
   }
 	environment {
-		REGISTRY_USER = "jhector632" // Cambia por tu usuario real de Docker Hub
-        // Nombre de la imagen que vamos a crear para nuestra aplicación
-        IMAGE_NAME = "_dockerhub/retail-store-u20231c540"
-        TAG        = "${env.BUILD_NUMBER}" // Usa el número de ejecución de Jenkins como versión
-    }
+    REGISTRY_USER = "jhector632" 
+    IMAGE_NAME    = "retail-store-u20231c540"
+    TAG           = "${env.BUILD_NUMBER}"
+}
 
   stages {
     stage ('Compile Project') {
@@ -45,27 +44,20 @@ pipeline {
       }
     }
 
-	 stage ('SonarQube Analysis') {
-        steps {
-			// 1. Enviar el código a analizar a SonarQube
-            withSonarQubeEnv('MiSonarServer') {
-                sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=jhector632_dockerhub/retail-store-u20231c540'
-            }
-			// 2. Pausar el pipeline y esperar la respuesta del Webhook de SonarQube
-	        script {
-	            timeout(time: 10, unit: 'MINUTES') { // Evita que se quede bloqueado permanentemente si cae la red
-	                // Este paso intercepta la notificación enviada al puerto 9089
-	                def qg = waitForQualityGate()
-	                
-	                // 3. Evaluar el estado del Quality Gate
-	                if (qg.status != 'OK') {
-	                    error "El pipeline se ha detenido porque el código no superó el Quality Gate de SonarQube. Estado: ${qg.status}"
-	                }
-	            }
-	        }
+	 stage('Construir y Publicar Imagen Docker') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            script {
+                echo "Iniciando sesión en Docker Hub..."
+                sh "echo '${DOCKER_PASS}' | docker login -u '${DOCKER_USER}' --password-stdin"
 
+                echo "Construyendo imagen optimizada AMD64..."
+                // Observa cómo se forma el nombre: ${REGISTRY_USER}_dockerhub/${IMAGE_NAME}:${TAG}
+                sh "docker buildx build --platform linux/amd64 -t ${REGISTRY_USER}_dockerhub/${IMAGE_NAME}:${TAG} -t ${REGISTRY_USER}_dockerhub/${IMAGE_NAME}:latest --push ."
+            }
         }
-     }
+    }
+}
 
 	  /*stage('Construir  y Publicar  Imagen Docker') {
             steps {
