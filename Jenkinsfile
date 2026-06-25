@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
         REGISTRY_USER = "jhector632" 
-        IMAGE_NAME    = "retail-store-u20231c540" 
+        IMAGE_NAME    = "dockerhub-retail-store-u20231c540" 
         TAG           = "${env.BUILD_NUMBER}" 
     }
 
@@ -76,7 +76,7 @@ pipeline {
 
                         echo "Construyendo y publicando imagen optimizada AMD64..."
                         // Construye y sube la imagen con la estructura estricta: usuario_dockerhub/retail-store-<codigo>:<tag>
-                        sh "docker buildx build --platform linux/amd64 -t ${REGISTRY_USER}_dockerhub/${IMAGE_NAME}:${TAG} -t ${REGISTRY_USER}_dockerhub/${IMAGE_NAME}:latest --push ."
+                        sh "docker buildx build --platform linux/amd64 -t ${REGISTRY_USER}/${IMAGE_NAME}:${TAG} -t ${REGISTRY_USER}_dockerhub/${IMAGE_NAME}:latest --push ."
                     }
                 }
             }
