@@ -68,15 +68,14 @@ pipeline {
 
         stage('Construir y Publicar Imagen Docker') {
             steps {
-                // Autenticación en Docker Hub
                 withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     script {
                         echo "Iniciando sesión en Docker Hub..."
                         sh "echo '${DOCKER_PASS}' | docker login -u '${DOCKER_USER}' --password-stdin"
 
                         echo "Construyendo y publicando imagen optimizada AMD64..."
-                        // Construye y sube la imagen con la estructura estricta: usuario_dockerhub/retail-store-<codigo>:<tag>
-                        sh "docker buildx build --platform linux/amd64 -t ${REGISTRY_USER}/${IMAGE_NAME}:${TAG} -t ${REGISTRY_USER}_dockerhub/${IMAGE_NAME}:latest --push ."
+                        
+                        sh "docker buildx build --platform linux/amd64 -t ${REGISTRY_USER}/${IMAGE_NAME}:${TAG} -t ${REGISTRY_USER}/${IMAGE_NAME}:latest --push ."
                     }
                 }
             }
