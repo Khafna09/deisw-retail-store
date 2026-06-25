@@ -7,7 +7,7 @@ pipeline {
 	environment {
 		REGISTRY_USER = "jhector632" // Cambia por tu usuario real de Docker Hub
         // Nombre de la imagen que vamos a crear para nuestra aplicación
-        IMAGE_NAME = "jhector632_dockerhub/retail-store-u20231c540:<tag>"
+        IMAGE_NAME = "_dockerhub/retail-store-u20231c540"
         TAG        = "${env.BUILD_NUMBER}" // Usa el número de ejecución de Jenkins como versión
     }
 
