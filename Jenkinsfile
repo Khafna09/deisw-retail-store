@@ -73,22 +73,6 @@ pipeline {
             }
         }*/
 
-	  stage('Construir y Publicar Imagen Docker') {
-            steps {
-                // Nos autenticamos de forma segura en Docker Hub usando el ID de credenciales de Jenkins
-                withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    script {
-                        echo "Iniciando sesión en Docker Hub..."
-                        sh "echo '${DOCKER_PASS}' | docker login -u '${DOCKER_USER}' --password-stdin"
-
-                        echo "Construyendo imagen optimizada AMD64..."
-                        // Compilamos forzando la plataforma AMD64 para evitar el error 'exec format error' en Render
-                        sh "docker buildx build --platform linux/amd64 -t ${REGISTRY_USER}/${IMAGE_NAME}:${TAG} -t ${REGISTRY_USER}/${IMAGE_NAME}:latest --push ."
-                    }
-                }
-            }
-        }
-	  
 
     /*stage ('package Project') {
         steps {
